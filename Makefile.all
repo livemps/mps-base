@@ -1,0 +1,42 @@
+# --- Distro test e---------------------------------------------------------
+DISTRO_DEFAULT  := arch
+DISTRO          ?= $(DISTRO_DEFAULT)
+ifeq ($(DISTRO),arch)
+DISTRO :=arch
+include Makefile.arch
+else ifeq ($(DISTRO_TYPE),debian)
+DISTRO :=debian
+include Makefile.debian
+else
+	DISTRO :=none
+endif
+distrotest:
+	@if [ $(DISTRO_CHECK) ] ; then \
+		echo "" ; \
+		echo "Include Check   : $(DISTRO_CHECK)" ; \
+		echo "Distribution    : $(DISTRO)" ; \
+		echo "Package Manager : $(PACKAGE_MANAGER)" ; \
+		echo "user            : $(USER)" ; \
+		echo "home            : $(HOME)" ; \
+		echo "pwd             : $(shell pwd)" ; \
+		echo "" ; \
+		echo "Press Str+C to abort installation" ; \
+		echo "" ; \
+		echo "" ; \
+		sleep 1 ; \
+		echo "Proceeding in 3 seconds..." ; \
+		sleep 1 ; \
+		echo "Proceeding in 2 seconds..." ; \
+		sleep 1 ; \
+		echo "Proceeding in 1 seconds..." ; \
+		sleep 1 ; \
+	else \
+		make --no-print-directory -C . error ; \
+		exit 0 ; \
+	fi
+# --- Error  -----------------------------------------------------------------
+error:
+	@echo ""
+	@echo "Usage: make DISTRO=arch|debian"
+	@echo ""
+

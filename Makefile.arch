@@ -1,0 +1,96 @@
+# --- Makefile config (Homefolders) --------------------------------------------
+MPS_ROOT            := ~/mps
+MPS_ROOT_DISKS      := /media/disks
+FOLDERS             := scratch repo tools vm disks docs wsp
+SYMLINKS            :=foo
+# --- Makefile config (PACMAN) ------------------------------------------------
+PACKAGE_MANAGER     :=pacman + yay
+PAC_INSTALL			:= echo "N" | sudo pacman --noconfirm -S
+PAC_UPDATE			:= echo "Y" | sudo pacman --noconfirm -Syy
+PAC_UPGRADE			:= echo "Y" | sudo pacman --noconfirm -Syu
+AUR_INSTALL			:= makepkg -si
+YAY_INSTALL			:= yay -S
+# --- Makefile config (PACMAN) ------------------------------------------------
+PAC_TRANSPORT       := ca-certificates curl gnupg extra/wget
+PAC_ESSENTIALS      := git vim sudo htop psmisc tree neofetch
+PAC_BASHUTILS       := cowsay fortune-mod cmatrix
+PAC_ARCHIVES        := zip unzip bzip2
+PAC_EDITOR			:= vim neovim
+PAC_BUILD           := gcc gdb base-devel
+PAC_NETWORK         := net-tools iptables tcpdump iw openssh nmap \
+					   extra/netcat dnsutils
+PAC_TEXTPROC        := community/pandoc
+# --- Makefile config (AUR) ---------------------------------------------------
+AUR_ARCHIVES        := dtrx
+AUR_TEXTPROC        := texlive-full
+# --- Makefile config (VIM) ---------------------------------------------------
+VIMPLUG             := ~/.vim/autoload/plug.vim
+NVIMPLUG            := ~/.local/share/nvim/site/autoload/plug.vim
+VIMPLUG_URL         := https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim 
+# --- Makefile config (FONT) --------------------------------------------------
+FONTS_URL_AWESOME   :=https://use.fontawesome.com/releases/v6.2.1/fontawesome-free-6.2.1-desktop.zip
+FONTS_URL_JETBRAINS :=https://github.com/ryanoasis/nerd-fonts/releases/download/v2.2.2/JetBrainsMono.zip  
+FONTS_URL_MONOID    :=https://github.com/ryanoasis/nerd-fonts/releases/download/v2.2.2/Monoid.zip
+# --- Makefile compliance -----------------------------------------------------
+DISTRO_CHECK        :=1
+# --- Help --------------------------------------------------------------------
+help:
+	@echo ""
+	@echo "Usage: make RAW|META"
+	@echo ""
+	@echo "  RAW:"
+	@echo "     homedir       : essential folders and config files in HOME"
+	@echo "     bash          : bash utils"
+	@echo "     edit          : THE editor (vim,neovim)"
+	@echo "     archives      : archive tools (zip,bzip,etc.)"
+	@echo "     transport     : transport tools (wget,curl, etc.)"
+	@echo "     aur           : yay for aur installations"
+	@echo "     osutils       : some essentials os tools (psmisc,htop,etc.)"
+	@echo "     min           : homedir,bash,edit,archives,transport,aur,osutils"
+	@echo "     dev           : min + development essentials"
+	@echo "     net           : min + network essentials"
+	@echo "     txt           : min + texlive-full,pandoc"
+	@echo ""
+	@echo "  META:"
+	@echo "     essentials    : Bare minimum (only min)"
+	@echo "     standard      : Default mps components (All but txt)"
+	@echo "     full          : All"
+	@echo ""
+# --- Prepare  -----------------------------------------------------------------
+prepare: distrotest
+	sudo $(PAC_UPDATE)
+	sudo $(PAC_UPGRADE)
+# --- AUR Packages ------------------------------------------------------------
+/usr/bin/yay: $(MPS_ROOT) prepare
+	-mkdir -p $(MPS_ROOT)/repo/aur/yay
+	-git clone https://aur.archlinux.org/yay.git $(MPS_ROOT)/repo/aur/yay
+	@if [ ! "$(USER)" == "root" ] ; then \
+		cd $(MPS_ROOT)/repo/aur/yay && $(AUR_INSTALL) ; \
+	fi
+# --- MIN Installers ----------------------------------------------------------
+bash: prepare
+	sudo $(PAC_INSTALL) $(PAC_BASHUTILS) 
+edit: prepare $(VIMPLUG) $(NVIMPLUG)
+	sudo $(PAC_INSTALL) $(PAC_EDITOR)
+archives: prepare aur
+	sudo $(PAC_INSTALL) $(PAC_ARCHIVES)
+	@if [ ! "$(USER)" == "root" ] ; then \
+		$(YAY_INSTALL) $(AUR_ARCHIVES) ; \
+	fi
+transport: 	prepare
+	sudo $(PAC_INSTALL) $(PAC_TRANSPORT)
+osutils: prepare	
+	sudo $(PAC_INSTALL) $(PAC_ESSENTIALS)
+aur: prepare /usr/bin/yay
+min: prepare homedir symlinks bash edit archives transport aur osutils
+# --- OPT Installers ----------------------------------------------------------
+net: min
+	sudo $(PAC_INSTALL) $(PAC_NETWORK) 
+dev: min
+	sudo $(PAC_INSTALL) $(PAC_BUILD) 
+# --- ALL Installers ----------------------------------------------------------
+txt: min
+	sudo $(PAC_INSTALL) $(PAC_TEXTPROC)
+	@if [ ! "$(USER)" == "root" ] ; then \
+		$(YAY_INSTALL) $(AUR_TEXTPROC) ; \
+	fi
