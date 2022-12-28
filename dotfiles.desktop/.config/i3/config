@@ -51,8 +51,6 @@ for_window [workspace=$ws7] layout stacked
 #### DEFAULT KEYBINDS ##########################################################
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
-# start a terminal
-bindsym $mod+Return exec x-terminal-emulator 
 # kill focused window
 bindsym $mod+Shift+q kill
 # change focus
@@ -148,8 +146,10 @@ bindsym $mod+Control+Mod1+Right workspace next
 bindsym $mod+Shift+v split h
 # split in vertical orientation
 bindsym $mod+v split v
+# start a terminal
+bindsym $mod+Return exec kitty
 # Applications
-bindsym Mod1+F1 exec i3-msg workspace $ws3 && firefox-esr
+bindsym Mod1+F1 exec i3-msg workspace $ws3 && firefox
 bindsym Mod1+F2 exec i3-msg workspace $ws7 && thunderbird
 bindsym Mod1+F3 exec i3-msg workspace $ws2 && thunar
 bindsym Mod1+F4 exec i3-msg workspace $ws9 && pavucontrol
