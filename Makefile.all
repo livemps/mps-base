@@ -77,7 +77,7 @@ $(MPS_ROOT)/snippets:
 	chmod a+x $(MPS_ROOT)/snippets/*
 ~/.ssh/id_rsa.pub: 
 	ssh-keygen
-$(MPS_ROOT): prepare fonts dotfiles $(MPS_ROOT)/snippets ~/.ssh/id_rsa.pub
+$(MPS_ROOT): archives fonts dotfiles $(MPS_ROOT)/snippets ~/.ssh/id_rsa.pub
 	@for mpsdir in $(FOLDERS) ; do \
 		mkdir -p $(MPS_ROOT)/$$mpsdir ; \
 	done ;

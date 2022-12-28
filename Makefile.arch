@@ -98,16 +98,16 @@ bash: prepare
 	sudo $(PAC_INSTALL) $(PAC_BASHUTILS) 
 edit: prepare $(VIMPLUG) $(NVIMPLUG)
 	sudo $(PAC_INSTALL) $(PAC_EDITOR)
-archives: prepare aur
+archives: aur
 	sudo $(PAC_INSTALL) $(PAC_ARCHIVES)
 	@if [ ! "$(USER)" == "root" ] ; then \
 		$(YAY_INSTALL) $(AUR_ARCHIVES) ; \
 	fi
-transport: 	prepare
+transport: prepare
 	sudo $(PAC_INSTALL) $(PAC_TRANSPORT)
 osutils: prepare	
 	sudo $(PAC_INSTALL) $(PAC_ESSENTIALS)
-aur: prepare /usr/bin/yay
+aur: prepare $(MPS_ROOT)/repo/yay/
 min: prepare homedir symlinks bash edit archives transport aur osutils
 # --- Desktop ---------------------------------------------------------------
 dotfiles.desktop:
