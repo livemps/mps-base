@@ -4,7 +4,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 RUN echo "Yes" | pacman --noconfirm -S git make sudo htop  
 ENV TERM=xterm
 RUN mkdir /mps 
-RUN git clone https://github.com/livemps/mps-base.git /mps
-RUN cd /mps && make min DISTRO=arch
+RUN git clone https://github.com/livemps/mps-base.git /mps \
+        && cd /mps && make aur DISTRO=arch
+
 CMD ["/bin/bash", "-i", "/bin/bash"]
 ENTRYPOINT ["/bin/sh", "-c"]

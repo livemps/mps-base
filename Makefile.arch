@@ -90,7 +90,7 @@ prepare: distrotest
 $(MPS_ROOT)/repo/yay/: symlinks
 	-mkdir -p $(MPS_ROOT)/repo/aur/yay
 	-git clone https://aur.archlinux.org/yay.git $(MPS_ROOT)/repo/aur/yay
-	@if [ "$(USER)" != "root" -o "$(USER)" != "" ] ; then \
+	@if [ "$(USER)" != "root" -a "$(USER)" != "" ] ; then \
 		cd $(MPS_ROOT)/repo/aur/yay && $(AUR_INSTALL) ; \
 	fi
 # --- MIN Installers ----------------------------------------------------------
@@ -100,7 +100,7 @@ edit: prepare $(VIMPLUG) $(NVIMPLUG)
 	sudo $(PAC_INSTALL) $(PAC_EDITOR)
 archives: aur
 	sudo $(PAC_INSTALL) $(PAC_ARCHIVES)
-	@if [ "$(USER)" != "root" -o "$(USER)" != "" ] ; then \
+	@if [ "$(USER)" != "root" -a "$(USER)" != "" ] ; then \
 		$(YAY_INSTALL) $(AUR_ARCHIVES) ; \
 	fi
 transport: prepare
@@ -114,7 +114,9 @@ dotfiles.desktop:
 	cp -rT dotfiles.desktop/ ~
 i3-desktop: dotfiles.desktop
 	sudo $(PAC_INSTALL) $(PAC_GUI_ESSENTIALS) $(PAC_GUI_TERMINAL)
-	$(YAY_INSTALL) $(AUR_THEME) $(AUR_EXTRAS)
+	@if [ "$(USER)" != "root" -a "$(USER)" != "" ] ; then \
+		$(YAY_INSTALL) $(AUR_THEME) $(AUR_EXTRAS) ; \
+	fi
 	sudo $(PAC_INSTALL) $(PAC_DSK_I3) $(PAC_DSK_X) $(PAC_DSK_GNOME_TOOLS) \
 			$(PAC_PYTHON) $(PAC_DSK_FONTS) $(PAC_DSK_BUMBLEBEE)
 	pip install bumblebee-status
@@ -133,6 +135,6 @@ dev: min
 # --- ALL Installers ----------------------------------------------------------
 txt: min
 	sudo $(PAC_INSTALL) $(PAC_TEXTPROC)
-	@if [ "$(USER)" != "root" -o "$(USER)" != "" ] ; then \
+	@if [ "$(USER)" != "root" -a "$(USER)" != "" ] ; then \
 		$(YAY_INSTALL) $(AUR_TEXTPROC) ; \
 	fi
