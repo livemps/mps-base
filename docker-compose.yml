@@ -1,0 +1,13 @@
+# docker-compose.yml
+version: '2'
+
+services:
+    mps-debian:
+        image: mps-debian
+        build:
+          context: .
+          dockerfile: Dockerfile.debian
+        networks:
+          - mps
+networks:
+  mps:

@@ -2,17 +2,17 @@
 MPS_ROOT            := ~/mps
 MPS_ROOT_DISKS      := /media/disks
 FOLDERS             := scratch repo tools vm disks docs wsp
-SYMLINKS            :=foo
+SYMLINKS            :=
 # --- Makefile config (PACMAN) ------------------------------------------------
 PACKAGE_MANAGER     :=apt
-APT_INSTALL			:= apt install --yes 
+APT_INSTALL			:= DEBIAN_FRONTEND='noninteractive' apt install --yes 
 APT_UPDATE			:= apt update --yes
 APT_UPGRADE			:= apt upgrade --yes
 APT_ALTERNATIVES    := update-alternatives --set
 # --- Makefile config (APT) ---------------------------------------------------
 APT_TRANSPORT       := apt-transport-https ca-certificates curl gnupg2 wget
-APT_ESSENTIALS      := git vim sudo htop psmisc tree neofetch
-APT_BASHUTILS       := cowsay fortune fortunes-de fortunes-off cmatrix
+APT_ESSENTIALS      := git vim sudo htop psmisc tree neofetch fontconfig
+APT_BASHUTILS       := cowsay fortune fortunes-de fortunes-off cmatrix console-setup
 APT_ARCHIVES        := zip unzip bzip2 dtrx
 APT_BUILD           := gcc gdb build-essential
 APT_NETWORK         := net-tools iptables tcpdump iw ssh nmap netcat dnsutils
@@ -80,7 +80,7 @@ edit: $(VIMPLUG) $(NVIMPLUG)
 	fi
 archives:
 	sudo $(APT_INSTALL) $(APT_ARCHIVES)
-transport: prepare
+transport: 
 	sudo $(APT_INSTALL) $(APT_TRANSPORT)
 osutils: 	
 	sudo $(APT_INSTALL) $(APT_ESSENTIALS)

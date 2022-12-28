@@ -1,0 +1,12 @@
+FROM debian
+RUN export DEBIAN_FRONTEND=noninteractive \
+    && apt update --yes && apt upgrade --yes \
+    && apt install git make sudo htop bash --yes \
+    && mkdir /mps-base
+COPY . /mps-base
+#ENTRYPOINT ["/bin/sh", "-c", "htop"]
+#RUN git clone https://github.com/livemps/mps-base.git \
+RUN cd /mps-base && make standard DISTRO=debian
+#ENTRYPOINT ["tail", "-f", "/dev/null" ]
+#ENTRYPOINT [ "tail" , "-f" , "/dev/null" ]
+#ENTRYPOINT ["tail", "-f", "/dev/null"]
