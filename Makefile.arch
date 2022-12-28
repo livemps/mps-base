@@ -5,9 +5,9 @@ FOLDERS             := scratch repo tools vm disks docs wsp
 SYMLINKS            :=foo
 # --- Makefile config (PACMAN) ------------------------------------------------
 PACKAGE_MANAGER     :=pacman + yay
-PAC_INSTALL			:= echo "N" | sudo pacman --noconfirm -S
-PAC_UPDATE			:= echo "Y" | sudo pacman --noconfirm -Syy
-PAC_UPGRADE			:= echo "Y" | sudo pacman --noconfirm -Syu
+PAC_INSTALL			:= echo "Yes" | sudo pacman --noconfirm -S
+PAC_UPDATE			:= echo "Yes" | sudo pacman --noconfirm -Syy
+PAC_UPGRADE			:= echo "Yes" | sudo pacman --noconfirm -Syu
 AUR_INSTALL			:= makepkg -si
 YAY_INSTALL			:= yay -S
 # --- Makefile config (PACMAN) ------------------------------------------------
@@ -20,17 +20,40 @@ PAC_BUILD           := gcc gdb base-devel
 PAC_NETWORK         := net-tools iptables tcpdump iw openssh nmap \
 					   extra/netcat dnsutils
 PAC_TEXTPROC        := community/pandoc
+# --- Makefile config (PACMAN-Desktop) -----------------------------------------
+PAC_GUI_ESSENTIALS  := galculator gedit gedit-plugins numlockx arandr
+PAC_GUI_TERMINAL    := gnome-terminal kitty
+PAC_GUI_WEB_CLIENTS := firefox thunderbird
+PAC_GUI_TXT_CLIENTS := evince gedit gedit-plugins
+PAC_GUI_MM_CLIENTS  := vlc
+PAC_DSK_X           := xorg mesa lib32-mesa xf86-video-nouveau
+PAC_DSK_BUMBLEBEE   := psutils gnome-system-monitor iw volumeicon \
+					   tk progress dbus-python
+PAC_DSK_THUNAR      := thunar thunar-archive-plugin thunar-media-tags-plugin \
+					   thunar-volman file-roller
+PAC_DSK_XFCE_TOOLS  := xfce4-goodies
+PAC_DSK_I3          := lightdm i3-gaps picom rofi feh lxappearance pipewire
+PAC_DSK_FONTS       := ttf-font-awesome
+PAC_DSK_GNOME_TOOLS := gnome-system-monitor network-manager-applet 
+PAC_PYTHON          := python-netifaces python-pygit2 python-psutil python-pip
+
 # --- Makefile config (AUR) ---------------------------------------------------
 AUR_ARCHIVES        := dtrx
 AUR_TEXTPROC        := texlive-full
+AUR_THEME			:= arc-solid-gtk-theme arc-gtk-theme lxde-icon-theme \
+					   gnome-icon-theme-extras
+AUR_EXTRAS			:= gitsome xcwd-git clight
 # --- Makefile config (VIM) ---------------------------------------------------
-VIMPLUG             := ~/.vim/autoload/plug.vim
-NVIMPLUG            := ~/.local/share/nvim/site/autoload/plug.vim
-VIMPLUG_URL         := https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim 
+VIMPLUG             :=~/.vim/autoload/plug.vim
+NVIMPLUG            :=~/.local/share/nvim/site/autoload/plug.vim
+VIMPLUG_URL         :=https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim 
 # --- Makefile config (FONT) --------------------------------------------------
 FONTS_URL_AWESOME   :=https://use.fontawesome.com/releases/v6.2.1/fontawesome-free-6.2.1-desktop.zip
 FONTS_URL_JETBRAINS :=https://github.com/ryanoasis/nerd-fonts/releases/download/v2.2.2/JetBrainsMono.zip  
 FONTS_URL_MONOID    :=https://github.com/ryanoasis/nerd-fonts/releases/download/v2.2.2/Monoid.zip
+FONTS_FILE_AWESOME 	:=fonts/Awesome/Font\ Awesome\ 6\ Free-Regular-400.otf 
+FONTS_FILE_MONOID   :=fonts/Monoid/Monoid\ Regular\ Nerd\ Font\ Complete.ttf
+FONTS_FILE_JETBRAINS:=fonts/JetBrainsMono/JetBrains\ Mono\ Regular\ Nerd\ Font\ Complete.ttf
 # --- Makefile compliance -----------------------------------------------------
 DISTRO_CHECK        :=1
 # --- Help --------------------------------------------------------------------
@@ -50,10 +73,13 @@ help:
 	@echo "     dev           : min + development essentials"
 	@echo "     net           : min + network essentials"
 	@echo "     txt           : min + texlive-full,pandoc"
+	@echo "     i3-all        : i3-desktop + gui-tools"
 	@echo ""
 	@echo "  META:"
 	@echo "     essentials    : Bare minimum (only min)"
-	@echo "     standard      : Default mps components (All but txt)"
+	@echo "     standard      : Default mps components (All but txt and desktop)"
+	@echo "     texlive       : Standard + txt (All but desktop)"
+	@echo "     desktop       : Standard + desktop (All but txt)"
 	@echo "     full          : All"
 	@echo ""
 # --- Prepare  -----------------------------------------------------------------
@@ -61,7 +87,7 @@ prepare: distrotest
 	sudo $(PAC_UPDATE)
 	sudo $(PAC_UPGRADE)
 # --- AUR Packages ------------------------------------------------------------
-/usr/bin/yay: $(MPS_ROOT) prepare
+$(MPS_ROOT)/repo/yay/: symlinks
 	-mkdir -p $(MPS_ROOT)/repo/aur/yay
 	-git clone https://aur.archlinux.org/yay.git $(MPS_ROOT)/repo/aur/yay
 	@if [ ! "$(USER)" == "root" ] ; then \
@@ -83,6 +109,20 @@ osutils: prepare
 	sudo $(PAC_INSTALL) $(PAC_ESSENTIALS)
 aur: prepare /usr/bin/yay
 min: prepare homedir symlinks bash edit archives transport aur osutils
+# --- Desktop ---------------------------------------------------------------
+dotfiles.desktop:
+	cp -rT dotfiles.desktop/ ~
+i3-desktop: dotfiles.desktop
+	sudo $(PAC_INSTALL) $(PAC_GUI_ESSENTIALS) $(PAC_GUI_TERMINAL)
+	$(YAY_INSTALL) $(AUR_THEME) $(AUR_EXTRAS)
+	sudo $(PAC_INSTALL) $(PAC_DSK_I3) $(PAC_DSK_X) $(PAC_DSK_GNOME_TOOLS) \
+			$(PAC_PYTHON) $(PAC_DSK_FONTS) $(PAC_DSK_BUMBLEBEE)
+	pip install bumblebee-status
+	#sudo update-alternatives --set x-terminal-emulator /usr/bin/kitty
+desktop-tools: dotfiles.desktop
+	sudo $(PAC_INSTALL) $(PAC_DSK_THUNAR) $(PAC_DSK_XFCE_TOOLS)  \
+			$(PAC_GUI_WEB_CLIENTS) $(PAC_GUI_TXT_CLIENTS) $(PAC_GUI_MM_CLIENTS)
+i3-all: dotfiles.desktop i3-desktop desktop-tools
 # --- OPT Installers ----------------------------------------------------------
 net: min
 	sudo $(PAC_INSTALL) $(PAC_NETWORK) 

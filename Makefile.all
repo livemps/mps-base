@@ -39,4 +39,56 @@ error:
 	@echo ""
 	@echo "Usage: make DISTRO=arch|debian"
 	@echo ""
+# --- Vim Plugins --------------------------------------------------------------
+$(VIMPLUG): 
+	-curl -fLo $(VIMPLUG) --create-dirs $(VIMPLUG_URL)
+$(NVIMPLUG): 
+	-mkdir ~/.config/nvim
+	-curl -fLo $(NVIMPLUG) --create-dirs $(VIMPLUG_URL)
+# --- Fonts Download ------------------------------------------------------------
+$(FONTS_FILE_AWESOME):
+	-mkdir -p ./fonts
+	wget $(FONTS_URL_AWESOME) -O ./fonts/Awesome.zip
+	unzip ./fonts/Awesome.zip -d ./fonts/Awesome/
+	cp ./fonts/Awesome/fontawesome-free-6.2.1-desktop/otfs/*.otf ./fonts/Awesome/
+	rm -rf ./fonts/Awesome.zip 
+	rm -rf ./fonts/Awesome/fontawesome-free-6.2.1-desktop/
+$(FONTS_FILE_MONOID):
+	-mkdir -p ./fonts
+	wget $(FONTS_URL_MONOID) -O ./fonts/Monoid.zip
+	unzip ./fonts/Monoid.zip -d ./fonts/Monoid
+	rm -rf ./fonts/Monoid.zip
+$(FONTS_FILE_JETBRAINS):
+	-mkdir -p ./fonts
+	wget $(FONTS_URL_JETBRAINS)  -O ./fonts/JetBrainsMono.zip
+	unzip ./fonts/JetBrainsMono.zip -d ./fonts/JetBrainsMono
+	rm -rf ./fonts/JetBrainsMono.zip
+# --- Fonts Targets ------------------------------------------------------------
+fonts: $(FONTS_FILE_AWESOME) $(FONTS_FILE_JETBRAINS) $(FONTS_FILE_MONOID)
+	-mkdir -p ~/.local/share/fonts
+	cp -r fonts/* ~/.local/share/fonts
+	fc-cache -f -v
+# --- HOME folder -------------------------------------------------------------
+dotfiles:
+	cp -rT dotfiles/ ~
+$(MPS_ROOT)/snippets:
+	mkdir -p $(MPS_ROOT)/snippets
+	cp snippets/* $(MPS_ROOT)/snippets/
+	chmod a+x $(MPS_ROOT)/snippets/*
+~/.ssh/id_rsa.pub: 
+	ssh-keygen
+$(MPS_ROOT): prepare fonts dotfiles $(MPS_ROOT)/snippets ~/.ssh/id_rsa.pub
+	@for mpsdir in $(FOLDERS) ; do \
+		mkdir -p $(MPS_ROOT)/$$mpsdir ; \
+	done ;
+symlinks: $(MPS_ROOT)
+	@if [ ! "$(SYMLINKS)" == "" ] ; then \
+		cd $(MPS_ROOT)/disks/ ; \
+		for drives in $(SYMLINKS) ; do \
+			rm $(MPS_ROOT)/disks/$$drives ; \
+			ln -s $(MPS_ROOT_DISKS)/$$drives ; \
+		done ; \
+		cd - ; \
+	fi
+homedir: symlinks
 
