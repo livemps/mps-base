@@ -9,5 +9,8 @@ services:
           dockerfile: Dockerfile.debian
         networks:
           - mps
+    #entrypoint: ["sleep", "infinity"]
+        stdin_open: true # docker run -i
+        tty: true        # docker run -t
 networks:
   mps:
