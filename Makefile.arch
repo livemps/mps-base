@@ -31,10 +31,10 @@ PAC_DSK_BUMBLEBEE   := psutils gnome-system-monitor iw volumeicon \
 					   tk progress dbus-python
 PAC_DSK_THUNAR      := thunar thunar-archive-plugin thunar-media-tags-plugin \
 					   thunar-volman file-roller
-PAC_DSK_XFCE_TOOLS  := xfce4-goodies
-PAC_DSK_I3          := lightdm i3-gaps picom rofi feh lxappearance pipewire
+PAC_DSK_XFCE_TOOLS  := xfce4-goodies pavucontrol
+PAC_DSK_I3          := lightdm i3-gaps picom rofi feh lxappearance pipewire-pulse
 PAC_DSK_FONTS       := ttf-font-awesome
-PAC_DSK_GNOME_TOOLS := gnome-system-monitor network-manager-applet 
+PAC_DSK_GNOME_TOOLS := gnome-system-monitor networkmanager network-manager-applet 
 PAC_PYTHON          := python-netifaces python-pygit2 python-psutil python-pip
 
 # --- Makefile config (AUR) ---------------------------------------------------
@@ -118,6 +118,8 @@ i3-desktop: dotfiles.desktop
 	sudo $(PAC_INSTALL) $(PAC_DSK_I3) $(PAC_DSK_X) $(PAC_DSK_GNOME_TOOLS) \
 			$(PAC_PYTHON) $(PAC_DSK_FONTS) $(PAC_DSK_BUMBLEBEE)
 	pip install bumblebee-status
+	sudo systemctl --type=service enable NetworkManager
+	sudo systemctl start NetworkManager
 	#sudo update-alternatives --set x-terminal-emulator /usr/bin/kitty
 desktop-tools: dotfiles.desktop
 	sudo $(PAC_INSTALL) $(PAC_DSK_THUNAR) $(PAC_DSK_XFCE_TOOLS)  \
