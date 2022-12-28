@@ -12,7 +12,8 @@ AUR_INSTALL			:= makepkg -si
 YAY_INSTALL			:= yay -S
 # --- Makefile config (PACMAN) ------------------------------------------------
 PAC_TRANSPORT       := ca-certificates curl gnupg extra/wget
-PAC_ESSENTIALS      := git vim sudo htop psmisc tree neofetch extra/fontconfig
+PAC_ESSENTIALS      := git vim sudo htop psmisc tree neofetch \
+					   core/openssh extra/fontconfig
 PAC_BASHUTILS       := cowsay fortune-mod cmatrix
 PAC_ARCHIVES        := zip unzip bzip2
 PAC_EDITOR			:= vim neovim
