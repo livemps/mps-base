@@ -1,0 +1,110 @@
+# --- Makefile config (Homefolders) --------------------------------------------
+MPS_ROOT            := ~/mps
+MPS_ROOT_DISKS      := /media/disks
+FOLDERS             := scratch repo tools vm disks docs wsp
+SYMLINKS            :=foo
+# --- Makefile config (PACMAN) ------------------------------------------------
+PACKAGE_MANAGER     :=apt
+APT_INSTALL			:= apt install --yes 
+APT_UPDATE			:= apt update --yes
+APT_UPGRADE			:= apt upgrade --yes
+APT_ALTERNATIVES    := update-alternatives --set
+# --- Makefile config (APT) ---------------------------------------------------
+APT_TRANSPORT       := apt-transport-https ca-certificates curl gnupg2 wget
+APT_ESSENTIALS      := git vim sudo htop psmisc tree neofetch
+APT_BASHUTILS       := cowsay fortune fortunes-de fortunes-off cmatrix
+APT_ARCHIVES        := zip unzip bzip2 dtrx
+APT_BUILD           := gcc gdb build-essential
+APT_NETWORK         := net-tools iptables tcpdump iw ssh nmap netcat dnsutils
+APT_TEXTPROC        := textlive-full pandoc
+# --- Makefile config (APT) ---------------------------------------------------
+APT_GUI_ESSENTIALS  := galculator gedit gedit-plugins numlockx arandr
+APT_GUI_TERMINAL    := gnome-terminal kitty
+APT_GUI_ICONS       := lxde-icon-theme gnome-extra-icons
+APT_GUI_WEB_CLIENTS := firefox-esr thunderbird
+APT_GUI_TXT_CLIENTS := evince gedit gedit-plugins
+APT_GUI_MM_CLIENTS  := vlc
+APT_DSK_X           := xorg xserver-xorg-video-nouveau xserver-xorg-video-vesa
+APT_DSK_OPENGL      := mesa-utils libglu1-mesa-dev freeglut3-dev \
+						mesa-common-dev libglew-dev libglfw3-dev \
+						libglm-dev libao-dev libmpg123-dev
+APT_DSK_BUMBLEBEE   := psutils gnome-system-monitor xcwd \
+						iw pulseaudio aptitude \
+						python3-tk progress python3-dbus
+APT_DSK_THUNAR      := thunar thunar-data thunar-archive-plugin \
+						thunar-media-tags-plugin thunar-volman \
+						xfce4-goodies xfce4-places-plugin \
+						thunar-gtkhash thunar-vcs-plugin file-roller
+APT_DSK_I3          := lightdm i3 compton rofi feh arc-theme \
+						lxappearance pnmixer pavucontrol
+APT_DSK_FONTS		:= fonts-font-awesome fonts-fork-awesome
+APT_DSK_X           := xbacklight
+APT_DSK_GNOME_TOOLS := gnome-system-monitor gitsome gitsome \
+						network-manager-gnome 
+APT_PYTHON          := python3-netifaces python3-pygit2 python3-psutil pip    
+# --- Makefile config (VIM) ---------------------------------------------------
+VIMPLUG             :=~/.vim/autoload/plug.vim
+NVIMPLUG            :=~/.local/share/nvim/site/autoload/plug.vim
+VIMPLUG_URL         :=https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim 
+# --- Makefile config (FONT) --------------------------------------------------
+FONTS_URL_AWESOME   :=https://use.fontawesome.com/releases/v6.2.1/fontawesome-free-6.2.1-desktop.zip
+FONTS_URL_JETBRAINS :=https://github.com/ryanoasis/nerd-fonts/releases/download/v2.2.2/JetBrainsMono.zip  
+FONTS_URL_MONOID    :=https://github.com/ryanoasis/nerd-fonts/releases/download/v2.2.2/Monoid.zip
+FONTS_FILE_AWESOME 	:=fonts/Awesome/Font\ Awesome\ 6\ Free-Regular-400.otf 
+FONTS_FILE_MONOID   :=fonts/Monoid/Monoid\ Regular\ Nerd\ Font\ Complete.ttf
+FONTS_FILE_JETBRAINS:=fonts/JetBrainsMono/JetBrains\ Mono\ Regular\ Nerd\ Font\ Complete.ttf
+# --- Makefile compliance -----------------------------------------------------
+DISTRO_CHECK        :=1
+# --- Help --------------------------------------------------------------------
+help:
+	@echo "Usage: make TARGET"
+	@echo ""
+	@echo "  Targets:"
+	@echo "     desktop-min   : i3 desktop"
+	@echo "     desktop-tools : desktop-min  + gui tools"
+	@echo ""
+# --- APT Installers ----------------------------------------------------------
+prepare:
+	sudo apt update --yes && sudo apt upgrade --yes
+	-mkdir -p ~/.config
+# --- MIN Installers ----------------------------------------------------------
+bash: prepare
+	sudo $(APT_INSTALL) $(APT_BASHUTILS) 
+edit: $(VIMPLUG) $(NVIMPLUG)
+	@if [ ! -f /usr/bin/nvim ] ; then \
+		sudo apt remove --purge neovim ; \
+		sudo apt autoremove ; \
+		curl -LO https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.deb ; \
+		sudo dpkg -i nvim-linux64.deb ; \
+		sudo rm nvim-linux64.deb ; \
+	fi
+archives:
+	sudo $(APT_INSTALL) $(APT_ARCHIVES)
+transport: prepare
+	sudo $(APT_INSTALL) $(APT_TRANSPORT)
+osutils: 	
+	sudo $(APT_INSTALL) $(APT_ESSENTIALS)
+min: prepare homedir symlinks bash edit archives transport osutils
+# --- Desktop Installers -----------------------------------------------------
+dotfiles.desktop:
+	cp -rT dotfiles.desktop/ ~
+i3-desktop: dotfiles.desktop
+	sudo $(APT_INSTALL) $(APT_DSK_I3) $(APT_DSK_X) $(APT_DSK_GNOME_TOOLS) \
+		$(APT_GUI_TERMINAL) $(APT_PYTHON) $(APT_DSK_FONTS) $(APT_DSK_BUMBLEBEE)
+	pip install bumblebee-status
+	sudo $(APT_ALTERNATIVES) x-terminal-emulator /usr/bin/kitty
+desktop-tools:
+	sudo $(APT_INSTALL) $(APT_GUI_ESSENTIALS) $(APT_GUI_ICONS) \
+		$(APT_GUI_WEB_CLIENTS) $(APT_GUI_TXT_CLIENTS) \
+		$(APT_GUI_MM_CLIENTS) $(APT_DSK_THUNAR)
+	sudo $(APT_ALTERNATIVES) x-www-browser /usr/bin/firefox-esr
+i3-all: dotfiles.desktop i3-desktop desktop-tools 
+# --- OPT Installers ----------------------------------------------------------
+net: min
+	sudo $(APT_INSTALL) $(APT_NETWORK) 
+dev: min
+	sudo $(APT_INSTALL) $(APT_BUILD) 
+# --- ALL Installers ----------------------------------------------------------
+txt: min
+	sudo $(APT_INSTALL) $(APT_TEXTPROC)
+	

@@ -1,10 +1,10 @@
 # --- Distro test e---------------------------------------------------------
-DISTRO_DEFAULT  := arch
-DISTRO          ?= $(DISTRO_DEFAULT)
+DISTRO_DEFAULT  :=debian
+DISTRO          ?=$(DISTRO_DEFAULT)
 ifeq ($(DISTRO),arch)
 DISTRO :=arch
 include Makefile.arch
-else ifeq ($(DISTRO_TYPE),debian)
+else ifeq ($(DISTRO),debian)
 DISTRO :=debian
 include Makefile.debian
 else
