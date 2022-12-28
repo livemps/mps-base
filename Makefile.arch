@@ -90,7 +90,7 @@ prepare: distrotest
 $(MPS_ROOT)/repo/yay/: symlinks
 	-mkdir -p $(MPS_ROOT)/repo/aur/yay
 	-git clone https://aur.archlinux.org/yay.git $(MPS_ROOT)/repo/aur/yay
-	@if [ ! "$(USER)" == "root" ] ; then \
+	@if [ ! "$(USER)" == "root" -o "$(USER)" == "" ] ; then \
 		cd $(MPS_ROOT)/repo/aur/yay && $(AUR_INSTALL) ; \
 	fi
 # --- MIN Installers ----------------------------------------------------------
@@ -100,7 +100,7 @@ edit: prepare $(VIMPLUG) $(NVIMPLUG)
 	sudo $(PAC_INSTALL) $(PAC_EDITOR)
 archives: aur
 	sudo $(PAC_INSTALL) $(PAC_ARCHIVES)
-	@if [ ! "$(USER)" == "root" ] ; then \
+	@if [ ! "$(USER)" == "root" -o "$(USER)" == "" ] ; then \
 		$(YAY_INSTALL) $(AUR_ARCHIVES) ; \
 	fi
 transport: prepare
@@ -133,6 +133,6 @@ dev: min
 # --- ALL Installers ----------------------------------------------------------
 txt: min
 	sudo $(PAC_INSTALL) $(PAC_TEXTPROC)
-	@if [ ! "$(USER)" == "root" ] ; then \
+	@if [ ! "$(USER)" == "root" -o "$(USER)" == "" ] ; then \
 		$(YAY_INSTALL) $(AUR_TEXTPROC) ; \
 	fi

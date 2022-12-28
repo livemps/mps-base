@@ -1,12 +1,10 @@
-FROM debian
+FROM archlinux
 RUN export DEBIAN_FRONTEND=noninteractive \
-    && apt update --yes && apt upgrade --yes \
-    && apt install git make sudo htop bash --yes \
-    && mkdir /mps-base
-COPY . /mps-base
-#ENTRYPOINT ["/bin/sh", "-c", "htop"]
-#RUN git clone https://github.com/livemps/mps-base.git \
-RUN cd /mps-base && make standard DISTRO=debian
-#ENTRYPOINT ["tail", "-f", "/dev/null" ]
-#ENTRYPOINT [ "tail" , "-f" , "/dev/null" ]
-#ENTRYPOINT ["tail", "-f", "/dev/null"]
+    && echo "Yes" | pacman --noconfirm -Syy && echo "Yes" | pacman --noconfirm -Syu
+RUN echo "Yes" | pacman --noconfirm -S git make sudo htop  
+ENV TERM=xterm
+RUN mkdir /mps 
+RUN git clone https://github.com/livemps/mps-base.git /mps
+RUN cd /mps && make min DISTRO=arch
+CMD ["/bin/bash", "-i", "/bin/bash"]
+ENTRYPOINT ["/bin/sh", "-c"]
